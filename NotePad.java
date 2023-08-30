@@ -2,6 +2,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.awt.print.PageFormat;
 import java.awt.print.PrinterJob;
 import java.io.File;
@@ -10,17 +12,24 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 
 public class NotePad implements ActionListener {
-    JFrame frame, jf;
+    JFrame frame, replace_frame, font_frame;
     JMenuBar menubar;
-    JMenu file, edit, format, help;
-    JMenuItem neww, open, save, saveas, page_setup, print, exit, cut, copy, paste, replace, date_time, font, font_color, textarea_color;
+    JMenu file, help;
+    JMenuItem neww, open, save, saveas, page_setup, print, exit;
+    JMenu edit;
+    JMenuItem cut, copy, paste, replace, date_time;
+    JMenu format;
+    JMenuItem font, font_color, textarea_color;
+    JCheckBoxMenuItem word_wrap;
     JTextArea textArea;
     String title = "Untitled_Notepad";
     File filee;
     JTextField jt1, jt2;
-    JButton jb;
+    JButton jb, ok;
+    JComboBox cb_font_family, cb_font_style, cb_font_size;
 
     NotePad() {
         try {
@@ -53,18 +62,22 @@ public class NotePad implements ActionListener {
         file = new JMenu("File");
 
         neww = new JMenuItem("New");
+        neww.setAccelerator(KeyStroke.getKeyStroke('N', InputEvent.CTRL_DOWN_MASK));
         neww.addActionListener(this);
         file.add(neww);
 
         open = new JMenuItem("Open");
+        open.setAccelerator(KeyStroke.getKeyStroke('O', InputEvent.CTRL_DOWN_MASK));
         open.addActionListener(this);
         file.add(open);
 
         save = new JMenuItem("Save");
+        save.setAccelerator(KeyStroke.getKeyStroke('S', InputEvent.CTRL_DOWN_MASK));
         save.addActionListener(this);
         file.add(save);
 
         saveas = new JMenuItem("Save-as");
+        saveas.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, 3));
         saveas.addActionListener(this);
         file.add(saveas);
 
@@ -75,6 +88,7 @@ public class NotePad implements ActionListener {
         file.add(page_setup);
 
         print = new JMenuItem("Print");
+        print.setAccelerator(KeyStroke.getKeyStroke('P', InputEvent.CTRL_DOWN_MASK));
         print.addActionListener(this);
         file.add(print);
 
@@ -88,31 +102,42 @@ public class NotePad implements ActionListener {
         edit = new JMenu("Edit");
 
         cut = new JMenuItem("Cut");
+        cut.setAccelerator(KeyStroke.getKeyStroke('X', InputEvent.CTRL_DOWN_MASK));
         cut.addActionListener(this);
         edit.add(cut);
 
         copy = new JMenuItem("Copy");
+        copy.setAccelerator(KeyStroke.getKeyStroke('C', InputEvent.CTRL_DOWN_MASK));
         copy.addActionListener(this);
         edit.add(copy);
 
         paste = new JMenuItem("Paste");
+        paste.setAccelerator(KeyStroke.getKeyStroke('V', InputEvent.CTRL_DOWN_MASK));
         paste.addActionListener(this);
         edit.add(paste);
 
         edit.addSeparator();
 
         replace = new JMenuItem("Replace");
+        replace.setAccelerator(KeyStroke.getKeyStroke('H', InputEvent.CTRL_DOWN_MASK));
         replace.addActionListener(this);
         edit.add(replace);
 
         edit.addSeparator();
 
-        date_time = new JMenuItem("Date-Time");
+        date_time = new JMenuItem("Date/Time");
+        date_time.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F5, 1));
         date_time.addActionListener(this);
         edit.add(date_time);
 
         //Format
         format = new JMenu("Format");
+
+        word_wrap = new JCheckBoxMenuItem("Word Wrap");
+        word_wrap.addActionListener(this);
+        format.add(word_wrap);
+
+        format.addSeparator();
 
         font = new JMenuItem("Font");
         font.addActionListener(this);
@@ -172,16 +197,23 @@ public class NotePad implements ActionListener {
             textArea.paste();
         }
         if (e.getSource() == replace) {
-            setReplace();
+            setReplaceFrame();
         }
         if (e.getSource() == jb) {
-            replace();
+            setreplace();
         }
         if (e.getSource() == date_time) {
             setDate_time();
         }
+        if (e.getSource() == word_wrap) {
+            boolean b = word_wrap.getState();
+            textArea.setLineWrap(b);
+        }
         if (e.getSource() == font) {
-            setFont();
+            setFontFrame();
+        }
+        if (e.getSource() == ok) {
+            setFonttoNotepad();
         }
         if (e.getSource() == font_color) {
             setFontColor();
@@ -288,44 +320,45 @@ public class NotePad implements ActionListener {
         }
     }
 
-    public void setReplace() {
-        jf = new JFrame("Replace");
-        jf.setSize(500, 300);
-        jf.setLayout(null);
-        jf.setLocation(500, 250);
+    public void setReplaceFrame() {
+        replace_frame = new JFrame("Replace");
+        replace_frame.setSize(500, 300);
+        replace_frame.setLayout(null);
+        replace_frame.setLocation(500, 250);
+
 
         JLabel jl1 = new JLabel("Find What: ");
         jl1.setBounds(50, 50, 80, 30);
-        jf.add(jl1);
+        replace_frame.add(jl1);
 
         jt1 = new JTextField();
         jt1.setBounds(120, 50, 200, 30);
-        jf.add(jt1);
+        replace_frame.add(jt1);
 
         JLabel jl2 = new JLabel("Replace With: ");
         jl2.setBounds(50, 100, 80, 30);
-        jf.add(jl2);
+        replace_frame.add(jl2);
 
         jt2 = new JTextField();
         jt2.setBounds(120, 100, 200, 30);
-        jf.add(jt2);
+        replace_frame.add(jt2);
 
         jb = new JButton("Replace");
         jb.addActionListener(this);
         jb.setBounds(200, 150, 100, 40);
-        jf.add(jb);
+        replace_frame.add(jb);
 
-        jf.setVisible(true);
+        replace_frame.setVisible(true);
     }
 
-    public void replace() {
+    public void setreplace() {
         String find_what = jt1.getText();
         String replace_with = jt2.getText();
         String text = textArea.getText();
         String new_text = text.replace(find_what, replace_with);
         textArea.setText(new_text);
 
-        jf.setVisible(false);
+        replace_frame.setVisible(false);
     }
 
     public void setDate_time() {
@@ -338,7 +371,54 @@ public class NotePad implements ActionListener {
         frame.setTitle(title);
     }
 
-    public void setFont() {
+    public void setFontFrame() {
+        font_frame = new JFrame("Font");
+        font_frame.setSize(650, 300);
+        font_frame.setLocation(450, 250);
+        font_frame.setLayout(null);
+
+        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        String[] font_family = ge.getAvailableFontFamilyNames();
+        cb_font_family = new JComboBox(font_family);
+        cb_font_family.setBounds(50, 50, 200, 30);
+        font_frame.add(cb_font_family);
+
+        String[] font_style = {"PLAIN", "BOLD", "ITALIC"};
+        cb_font_style = new JComboBox(font_style);
+        cb_font_style.setBounds(300, 50, 100, 30);
+        font_frame.add(cb_font_style);
+
+        Integer[] font_size = {8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72};
+        cb_font_size = new JComboBox(font_size);
+        cb_font_size.setBounds(450, 50, 80, 30);
+        font_frame.add(cb_font_size);
+
+        ok = new JButton("OK");
+        ok.setBounds(250, 150, 80, 50);
+        ok.addActionListener(this);
+        font_frame.add(ok);
+
+        font_frame.setVisible(true);
+    }
+
+    public void setFonttoNotepad() {
+        String font_family = (String) cb_font_family.getSelectedItem();
+        String font_style = (String) cb_font_style.getSelectedItem();
+        Integer font_size = (Integer) cb_font_size.getSelectedItem();
+
+        int f_style = 0;
+        if (font_style.equals("PLAIN")) {
+            f_style = Font.PLAIN;
+        } else if (font_style.equals("BOLD")) {
+            f_style = Font.BOLD;
+        } else {
+            f_style = Font.ITALIC;
+        }
+
+        Font f = new Font(font_family, f_style, font_size);
+
+        textArea.setFont(f);
+        font_frame.setVisible(false);
 
     }
 
