@@ -23,6 +23,8 @@ public class NotePad implements ActionListener {
     JMenuItem cut, copy, paste, replace, date_time;
     JMenu format;
     JMenuItem font, font_color, textarea_color;
+    JMenu view, zoom;
+    JMenuItem zoomin, zoomout;
     JCheckBoxMenuItem word_wrap;
     JTextArea textArea;
     String title = "Untitled_Notepad";
@@ -31,7 +33,11 @@ public class NotePad implements ActionListener {
     JButton jb, ok;
     JComboBox cb_font_family, cb_font_style, cb_font_size;
 
-    NotePad() {
+    public NotePad() {
+        invokeGUI();
+    }
+
+    private void invokeGUI() {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
@@ -133,12 +139,6 @@ public class NotePad implements ActionListener {
         //Format
         format = new JMenu("Format");
 
-        word_wrap = new JCheckBoxMenuItem("Word Wrap");
-        word_wrap.addActionListener(this);
-        format.add(word_wrap);
-
-        format.addSeparator();
-
         font = new JMenuItem("Font");
         font.addActionListener(this);
         format.add(font);
@@ -153,6 +153,26 @@ public class NotePad implements ActionListener {
         textarea_color.addActionListener(this);
         format.add(textarea_color);
 
+        //View
+        view = new JMenu("View");
+
+        zoom = new JMenu("Zoom");
+
+        zoomin = new JMenuItem("Zoom in");
+        zoomin.addActionListener(this);
+        zoom.add(zoomin);
+
+        zoomout = new JMenuItem("Zoom out");
+        zoomout.addActionListener(this);
+        zoom.add(zoomout);
+
+        view.add(zoom);
+        view.addSeparator();
+
+        word_wrap = new JCheckBoxMenuItem("Word Wrap");
+        word_wrap.addActionListener(this);
+        view.add(word_wrap);
+
         //Help
         help = new JMenu("Help");
         help.addActionListener(this);
@@ -160,6 +180,7 @@ public class NotePad implements ActionListener {
         menubar.add(file);
         menubar.add(edit);
         menubar.add(format);
+        menubar.add(view);
         menubar.add(help);
         return menubar;
     }
@@ -205,10 +226,6 @@ public class NotePad implements ActionListener {
         if (e.getSource() == date_time) {
             setDate_time();
         }
-        if (e.getSource() == word_wrap) {
-            boolean b = word_wrap.getState();
-            textArea.setLineWrap(b);
-        }
         if (e.getSource() == font) {
             setFontFrame();
         }
@@ -220,6 +237,20 @@ public class NotePad implements ActionListener {
         }
         if (e.getSource() == textarea_color) {
             setTextAreaColor();
+        }
+        if (e.getSource() == zoomin) {
+            Font currentFont = textArea.getFont();
+            int newSize = currentFont.getSize() + 2; // Increase the font size by 2 points
+            setFontSize(textArea, newSize);
+        }
+        if (e.getSource() == zoomout) {
+            Font currentFont = textArea.getFont();
+            int newSize = currentFont.getSize() - 2; // Decrease the font size by 2 points
+            setFontSize(textArea, newSize);
+        }
+        if (e.getSource() == word_wrap) {
+            boolean b = word_wrap.getState();
+            textArea.setLineWrap(b);
         }
     }
 
@@ -430,6 +461,11 @@ public class NotePad implements ActionListener {
     public void setTextAreaColor() {
         Color c = JColorChooser.showDialog(frame, "Select Text Area Color", Color.WHITE);
         textArea.setBackground(c);
+    }
+
+    public static void setFontSize(JTextArea textArea, int size) {
+        Font currentFont = textArea.getFont();
+        textArea.setFont(new Font(currentFont.getName(), currentFont.getStyle(), size));
     }
 
     public static void main(String[] args) {
