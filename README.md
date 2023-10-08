@@ -27,7 +27,7 @@ Documents can be printed using standard printer dialogs.
 # User Interface:
 The application features a graphical user interface (GUI) with a text editing area, menus, and various dialog boxes for user interaction.
 
-Overall, this code provides the core functionality of a basic text editor with a user-friendly interface, making it possible for users to create and manipulate text documents.
+# Overall, this code provides the core functionality of a basic text editor with a user-friendly interface, making it possible for users to create and manipulate text documents.
 
 
 
